@@ -1,3 +1,8 @@
+/**
+ * This is the file that takes care of 
+ * how the Graph component of our App 
+ * is rendered and reacts to any state changes.
+ */
 import React, { Component } from 'react';
 import { Table } from '@finos/perspective';
 import { ServerRespond } from './DataStreamer';
@@ -14,7 +19,9 @@ interface IProps {
  * Perspective library adds load to HTMLElement prototype.
  * This interface acts as a wrapper for Typescript compiler.
  */
-interface PerspectiveViewerElement {
+
+//Extended 'HTMLElement' class from the 'PerspectiveViewerElement' interface 
+interface PerspectiveViewerElement extends HTMLElement{
   load: (table: Table) => void,
 }
 
@@ -30,9 +37,11 @@ class Graph extends Component<IProps, {}> {
     return React.createElement('perspective-viewer');
   }
 
+  //componentDidMount() runs after the component output has been rendered to the DOM.
   componentDidMount() {
     // Get element to attach the table from the DOM.
-    const elem: PerspectiveViewerElement = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
+    // Simplified the 'const elem' becasue 'PerspectiveViewerElement'is extended with 'HTMLElement' 
+    const elem = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
 
     const schema = {
       stock: 'string',
@@ -49,6 +58,21 @@ class Graph extends Component<IProps, {}> {
 
       // Add more Perspective configurations here.
       elem.load(this.table);
+      // Added more attributes
+      // 'view' visualizes the data.
+      elem.setAttribute("view", "y_line");
+      // 'colum-pivots' allows us to distinguish stock ABC from DEF.
+      elem.setAttribute("column-pivots", '["stock"]');
+      // 'row-pivots' allows care of x-axis.
+      elem.setAttribute("row-pivots", '["timestamp"]');
+      // 'columns' allows  us to focus on particular part of a stock's data along the y-axis.
+      elem.setAttribute("columns",'["top_ask_price"]');
+      // ‘aggregates’ allows to handle the duplicated data.
+      elem.setAttribute("aggregates",
+      '{"stock":"distict count", "top_ask_price":"avg", "top_bid_price":"avg", "timestamp":"distinct count"}'
+      
+      );
+    
     }
   }
 
